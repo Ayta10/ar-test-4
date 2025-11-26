@@ -1,49 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <title>AR с 3D-моделью и звуком</title>
+
+  <!-- A-Frame и AR.js -->
   <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
   <script src="https://raw.githack.com/jeromeetienne/AR.js/2.0.5/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    /* Кнопка включения звука */
+    #soundBtn {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 20px;
+      background: #ff4747;
+      color: white;
+      border-radius: 10px;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      z-index: 9999;
+    }
+  </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
+  <!-- Кнопка включения звука -->
+  <button id="soundBtn">🔊 Включить звук</button>
+
   <a-scene embedded arjs="patternRatio: 0.7">
 
-    <a-marker 
-      type="pattern" 
-      url="marker.patt">
+    <!-- Маркер -->
+    <a-marker id="marker" type="pattern" url="marker.patt">
 
+      <!-- 3D-модель -->
       <a-gltf-model 
-        src="scene.gltf" 
-        scale="20 20 20" 
-        position="0 0 0" 
+        src="scene.gltf"
+        scale="0.5 0.5 0.5"
+        position="0 0 0"
         rotation="0 180 0">
       </a-gltf-model>
+
+      <!-- Звук -->
       <a-sound 
         id="mysound"
-        src="audio.mp3" 
-        autoplay="true"
+        src="audio.mp3"
+        autoplay="false"
         loop="true"
         volume="1.0">
       </a-sound>
 
     </a-marker>
 
+    <!-- Камера -->
     <a-entity camera></a-entity>
 
   </a-scene>
 
+  <script>
+    // Получаем элементы
+    const button = document.querySelector("#soundBtn");
+    const marker = document.querySelector("#marker");
+    const sound = document.querySelector("#mysound");
+
+    let soundEnabled = false; // звук пока не разрешён
+
+    // Клик по кнопке разрешает звук
+    button.addEventListener("click", () => {
+      soundEnabled = true;
+      button.style.display = "none"; // скрываем кнопку
+    });
+
+    // Маркер найден → запускаем звук
+    marker.addEventListener("markerFound", () => {
+      if (soundEnabled) {
+        sound.components.sound.playSound();
+      }
+    });
+
+    // Маркер потерян → останавливаем звук
+    marker.addEventListener("markerLost", () => {
+      sound.components.sound.stopSound();
+    });
+  </script>
+
 </body>
-
-
 </html>
-
-
-
-
-
-
-
-
-
